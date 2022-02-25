@@ -30,6 +30,10 @@ class Matrix:
             result_rows.append(tuple(x - y for x, y in zip(r1, r2)))
         return Matrix(*result_rows)
 
+    def __getitem__(self, xy):
+        x, y = xy
+        return self.values[x][y]
+
     def det(self):
         if self.size[0] != self.size[1]:
             return 0
