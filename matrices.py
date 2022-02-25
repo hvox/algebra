@@ -35,6 +35,34 @@ class Matrix:
             return 0
         raise NotImplemented()
 
+    def to_triangle(self):
+        if self.size[0] != self.size[1]:
+            yield "It is impossible to create triangle matrix out of the square one"
+            yield None
+            return
+        rows = list(self.values)
+        multiplier = Rational(1)
+        for i in range(self.size[0]):
+            for j in range(i, self.size[0]):
+                if rows[j][i] != 0:
+                    if i != j:
+                        yield f"Let's switch the row {i+1} and {j+1}."
+                        rows[i], rows[j] = rows[j], rows[i]
+                        multiplier *= -1
+                        yield Matrix(*rows)
+                    break
+            else:
+                continue
+            for j in range(i + 1, self.size[0]):
+                if rows[j][i] == 0:
+                    continue
+                ratio = - rows[j][i] / rows[i][i]
+                yield f"Add the multiple of {ratio} of the row {i + 1} to the row {j + 1}."
+                rows[j] = tuple(x + ratio * y for x, y in zip(rows[j], rows[i]))
+                yield Matrix(*rows)
+        yield f"As you can see, we got the triangle matrix."
+        yield Matrix(*rows)
+
     def interactive_determinant(self):
         if self.size[0] != self.size[1]:
             yield "Determinant is not defined for non-square matrix."
