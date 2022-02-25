@@ -33,7 +33,25 @@ class Matrix:
     def det(self):
         if self.size[0] != self.size[1]:
             return 0
-        raise NotImplemented()
+        rows = list(self.values)
+        result = Rational(1)
+        for i in range(self.size[0]):
+            for j in range(i, self.size[0]):
+                if rows[j][i] != 0:
+                    if i != j:
+                        rows[i], rows[j] = rows[j], rows[i]
+                        result *= -1
+                    break
+            else:
+                return 0
+            for j in range(i + 1, self.size[0]):
+                if rows[j][i] == 0:
+                    continue
+                ratio = - rows[j][i] / rows[i][i]
+                rows[j] = tuple(x + ratio * y for x, y in zip(rows[j], rows[i]))
+        for i in range(self.size[0]):
+            result *= rows[i][i]
+        return result
 
     def to_triangle(self):
         if self.size[0] != self.size[1]:
