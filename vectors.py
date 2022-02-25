@@ -1,5 +1,6 @@
 from numbersretthinked import Rational
 from human_api import Message, raise_messages
+import scipy.linalg as linalg
 import matrices
 
 
@@ -65,13 +66,20 @@ def try_to_demonstrate_linear_dependence(vectors):
     triangle = [None]
     yield from raise_messages(m.to_triangle(), triangle)
     m = triangle[0]
-    #TODO
+    d = m.det()
+    if det != 0:
+        yield "The matrix determinant does not equals to zero, so the vectors are linearly independent."
+        yield False
+        return
     determinant = [None]
     yield from raise_messages(m.interactive_determinant(), determinant)
     if determinant[0] == 0:
         yield "The determinant is zero, so the vectors are linearly dependent."
         yield False
         return
+    linalg
+    # TODO sovle system of equations
+    raise NotImplemented()
     yield "The determinant does not equals to zero, so the vectors are linearly independent."
     yield True
     return
