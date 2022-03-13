@@ -3,6 +3,6 @@ from fractions import Fraction
 
 class Rational(Fraction):
     def __str__(self):
-        denominator = self.denominator
-        denominator = f"/{denominator}" if denominator != 1 else ""
-        return f"{self.numerator}{denominator}"
+        if self.denominator == 1:
+            return str(self.numerator)
+        return f"{self.numerator}/{self.denominator}"
