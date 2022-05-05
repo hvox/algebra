@@ -10,6 +10,8 @@ class Rational(Fraction):
 
 def GaloisField(p):
     class GaloisField:
+        size = p
+
         def __init__(self, value):
             self.value = value % p
 
@@ -30,5 +32,8 @@ def GaloisField(p):
 
         def __pow__(self, n):
             return self.__class__(pow(self.value, n, p))
+
+        def __eq__(self, other):
+            return self.value == getattr(other, "value", other)
 
     return GaloisField
