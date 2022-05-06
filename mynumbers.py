@@ -37,3 +37,13 @@ def GaloisField(p):
             return self.value == getattr(other, "value", other)
 
     return GaloisField
+
+
+def SignedGaloisField(p):
+    class SignedGaloisField(GaloisField(p)):
+        def __str__(self):
+            if self.value * 2 > self.size:
+                return str(-self.size + self.value)
+            return str(self.value)
+
+    return SignedGaloisField
