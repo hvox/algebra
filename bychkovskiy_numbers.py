@@ -1,3 +1,6 @@
+BYCHKOVSKIY_NUMBER = 2**3**4
+
+
 def bychkovskiy_number(x, k):
     assert isinstance(k, int), "k must be integer!"
     result = 1
@@ -6,7 +9,6 @@ def bychkovskiy_number(x, k):
     return x**result
 
 
-BYCHKOVSKIY_NUMBER = 2**3**4
 if __name__ == "__main__":
     x = 2
     for n in range(-2, 10):
