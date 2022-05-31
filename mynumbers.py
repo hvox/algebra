@@ -1,11 +1,42 @@
 from fractions import Fraction
 
 
+def ilog(n, base):
+    log = 0
+    while n % base == 0:
+        n //= base
+        log += 1
+    return log
+
+
+def fraction2str(numerator, denominator):
+    integer_part = str(numerator // denominator)
+    numerator = numerator % denominator
+    digits, states = [], {}
+    while numerator and numerator not in states:
+        states[numerator] = len(digits)
+        digits.append(numerator * 10 // denominator)
+        numerator = numerator * 10 % denominator
+    if not numerator:
+        return integer_part + ("." + "".join(map(str, digits))) * bool(digits)
+        if digits:
+            return integer_part + "." + "".join(map(str, digits))
+        return integer_part
+    main_part = "".join(map(str, digits[: states[numerator]]))
+    repeating_part = "(" + "".join(map(str, digits[states[numerator] :])) + ")"
+    return integer_part + "." + main_part + repeating_part
+
+
 class Rational(Fraction):
     def __str__(self):
         if self.denominator == 1:
             return str(self.numerator)
         return f"{self.numerator}/{self.denominator}"
+
+
+class RecurringDecimal(Rational):
+    def __str__(self):
+        return fraction2str(self.numerator, self.denominator)
 
 
 def GaloisField(p):
