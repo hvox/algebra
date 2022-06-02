@@ -9,7 +9,8 @@ def ilog(n, base):
     return log
 
 
-def fraction2str(numerator, denominator):
+def fraction_to_recurring_decimal(fraction, max_digits=None):
+    numerator, denominator = fraction.numerator, fraction.denominator
     integer_part = str(numerator // denominator)
     numerator = numerator % denominator
     digits, states = [], {}
@@ -17,6 +18,8 @@ def fraction2str(numerator, denominator):
         states[numerator] = len(digits)
         digits.append(numerator * 10 // denominator)
         numerator = numerator * 10 % denominator
+        if max_digits is not None and len(digits) > max_digits:
+            return None
     if not numerator:
         return integer_part + ("." + "".join(map(str, digits))) * bool(digits)
         if digits:
@@ -27,16 +30,36 @@ def fraction2str(numerator, denominator):
     return integer_part + "." + main_part + repeating_part
 
 
+def fraction_to_sum(fraction):
+    numerator, denominator = fraction.numerator, fraction.denominator
+    integer_part = numerator // denominator
+    fractional_part = Fraction(numerator % denominator, denominator)
+    return f"{integer_part}+" * bool(integer_part) + f"{fractional_part}"
+
+
+def fraction_to_short_str(fraction):
+    sum_representation = fraction_to_sum(fraction)
+    decimal = fraction_to_recurring_decimal(fraction, len(sum_representation))
+    if decimal is None or len(sum_representation) < len(decimal):
+        return sum_representation
+    return decimal
+
+
 class Rational(Fraction):
-    def __str__(self):
-        if self.denominator == 1:
-            return str(self.numerator)
-        return f"{self.numerator}/{self.denominator}"
+    def as_recurring_decimal(self):
+        return fraction_to_recurring_decimal(self)
 
+    def as_sum(self):
+        return fraction_to_sum(self)
 
-class RecurringDecimal(Rational):
+    def as_fraction(self):
+        return str(Fraction(self))
+
+    def as_short_string(self):
+        return fraction_to_short_str(self)
+
     def __str__(self):
-        return fraction2str(self.numerator, self.denominator)
+        return self.as_short_string()
 
 
 def GaloisField(p):

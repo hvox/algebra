@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-from mynumbers import RecurringDecimal, Rational
+from mynumbers import Rational
 
 try:
     while True:
         try:
             inp = input("number = ").replace(" ", "")
-            x, y = RecurringDecimal(inp), RecurringDecimal(float(eval(inp)))
-            print("as frc =", Rational(x))
-            print("as flt =", y)
-            print("as dec =", x)
+            x, y = Rational(inp), Rational(float(eval(inp)))
+            print("as sum =", x.as_sum())
+            print("as frc =", x.as_fraction())
+            print("as dec =", x.as_recurring_decimal())
+            print("as str =", x.as_short_string())
+            print("as flt =", y.as_recurring_decimal())
             print()
         except ValueError as e:
             print("\x1b[0;31mERROR:", e, "\x1b[0m", end="\n\n")
