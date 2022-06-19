@@ -1,4 +1,5 @@
 import math
+from functools import reduce
 
 from frozendict import frozendict
 
@@ -39,6 +40,21 @@ class LCoQI:
     def __init__(self, coeffs):
         coeffs = {frozenset(normalize_root(r)): c for r, c in coeffs.items()}
         self.coeffs = frozendict(coeffs)
+
+    def inverse(self):
+        if len(self.coeffs) == 1 and frozenset({}) in self.coeffs:
+            return LCoQI({1: 1 / Rational(self.coeffs[frozenset({})])})
+        numerator, denominator = LCoQI({1: 1}), self
+        for root in reduce(lambda x, y: x | y, denominator.coeffs):
+            complement = LCoQI(
+                {
+                    roots: (-coef if root in roots else coef)
+                    for roots, coef in denominator.coeffs.items()
+                }
+            )
+            denominator *= complement
+            numerator *= complement
+        return numerator / denominator
 
     def __str__(self):
         terms = []
@@ -83,6 +99,9 @@ class LCoQI:
         for factor in additional_factors:
             result *= factor
         return result
+
+    def __truediv__(self, other):
+        return self * other.inverse()
 
     def __pow__(self, power: int):
         n = abs(power)
