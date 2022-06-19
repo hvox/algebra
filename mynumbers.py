@@ -34,6 +34,8 @@ def fraction_to_sum(fraction):
     numerator, denominator = fraction.numerator, fraction.denominator
     integer_part = numerator // denominator
     fractional_part = Fraction(numerator % denominator, denominator)
+    if not fractional_part:
+        return f"{integer_part}"
     return f"{integer_part}+" * bool(integer_part) + f"{fractional_part}"
 
 
