@@ -36,6 +36,19 @@ def root_to_str(roots):
     return "".join(result) if result else ""
 
 
+def root_to_markdown(roots):
+    result, number = [], 1
+    for root in roots:
+        match root:
+            case int(x):
+                number *= x
+            case "+√", int(x):
+                result.append("\sqrt{" + str(x) + "+\sqrt{" + str(x) + "}}")
+    if number != 1:
+        result.append("\sqrt{" + str(number) + "}")
+    return "\\".join(result) if result else ""
+
+
 class LCoQI:
     def __init__(self, coeffs):
         coeffs = {frozenset(normalize_root(r)): c for r, c in coeffs.items()}
@@ -112,6 +125,13 @@ class LCoQI:
             n //= 2
             factor *= factor
         return result if power >= 0 else result.inverse()
+
+    def _repr_markdown_(self):
+        terms = []
+        for root, coef in self.coeffs.items():
+            root = root_to_markdown(root)
+            terms.append(str(coef) + root if coef != 1 else root or "1")
+        return "$ " + ("+".join(terms) if terms else "0") + " $"
 
 
 if __name__ == "__main__":
