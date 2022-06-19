@@ -63,6 +63,11 @@ class Rational(Fraction):
     def __str__(self):
         return self.as_short_string()
 
+    def to_tex(self):
+        fraction = str(Fraction(self))
+        if "/" not in fraction:
+            return fraction
+        return "\\frac{" + fraction.replace("/", "}{") + "}"
 
 def GaloisField(p):
     class GaloisField:

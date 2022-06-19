@@ -6,13 +6,14 @@ from frozendict import frozendict
 from mynumbers import Rational
 
 
-def normalize_root(x):
+def normalize_root(root):
+    x = root
     if isinstance(x, (set, frozenset)):
         return frozenset(x)
     if isinstance(x, tuple) and x[0] == "+√":
         return frozenset({x})
     factors, r = [], x
-    for p in range(2, math.isqrt(x)):
+    for p in range(2, math.isqrt(x) + 1):
         if x % p == 0:
             x //= p
             factors.append(p)
@@ -36,7 +37,7 @@ def root_to_str(roots):
     return "".join(result) if result else ""
 
 
-def root_to_markdown(roots):
+def root_to_latex(roots):
     result, number = [], 1
     for root in roots:
         match root:
@@ -46,17 +47,17 @@ def root_to_markdown(roots):
                 result.append("\sqrt{" + str(x) + "+\sqrt{" + str(x) + "}}")
     if number != 1:
         result.append("\sqrt{" + str(number) + "}")
-    return "\\".join(result) if result else ""
+    return "".join(result) if result else ""
 
 
 class LCoQI:
     def __init__(self, coeffs):
-        coeffs = {frozenset(normalize_root(r)): c for r, c in coeffs.items()}
+        coeffs = {frozenset(normalize_root(r)): Rational(c) for r, c in coeffs.items()}
         self.coeffs = frozendict(coeffs)
 
     def inverse(self):
         if len(self.coeffs) == 1 and frozenset({}) in self.coeffs:
-            return LCoQI({1: 1 / Rational(self.coeffs[frozenset({})])})
+            return LCoQI({1: Rational(1) / self.coeffs[frozenset({})]})
         numerator, denominator = LCoQI({1: 1}), self
         for root in reduce(lambda x, y: x | y, denominator.coeffs):
             complement = LCoQI(
@@ -126,16 +127,28 @@ class LCoQI:
             factor *= factor
         return result if power >= 0 else result.inverse()
 
-    def _repr_markdown_(self):
+    def __float__(self):
+        result = float(0)
+        for roots, coef in self.coeffs.items():
+            term = float(coef)
+            for x in roots:
+                term *= x**0.5 if isinstance(x, int) else (x[1] + x[1]**0.5)**0.5
+            result += term
+        return result
+
+    def to_tex(self):
         terms = []
         for root, coef in self.coeffs.items():
-            root = root_to_markdown(root)
-            terms.append(str(coef) + root if coef != 1 else root or "1")
-        return "$ " + ("+".join(terms) if terms else "0") + " $"
+            root = root_to_latex(root)
+            terms.append(coef.to_tex() + root if coef != 1 else root or "1")
+        return ("+".join(terms) if terms else "0")
+
+    def _repr_latex_(self):
+        return "$$ " + self.to_tex() + " $$"
 
 
 if __name__ == "__main__":
     x = LCoQI({("+√", 2): 1})
     print(f"x = {x}")
-    for n in range(0, 32):
+    for n in range(-16, 16 + 1):
         print(f"x^{n} = {x**n}")
