@@ -19,6 +19,21 @@ def mersene_prime(n):
     return 2 ** MERSENNE_PRIME_EXPONENTS[n - 1] - 1
 
 
+def lehmann(n):
+    if n < 2:
+        return False
+    all_ones = True
+    m = (n - 1) // 2
+    for _ in range(50):
+        a = random.randint(1, n - 1)
+        a_to_the_m = pow(a, m, n)
+        if a_to_the_m not in {1, n-1}:
+            return False
+        if a_to_the_m == n - 1:
+            all_ones = False
+    return not all_ones
+
+
 def miller_rabin_copypasted_from_the_internet(n, k=10):
     if n < 5:
         return n in (2, 3)
@@ -75,17 +90,13 @@ def miller_rabin(n):
 
 
 if __name__ == "__main__":
-    primes = set(
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61]
-        + [67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137]
-        + [139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199]
-        + [211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277]
-    )
+    primes = {x for x in range(2**16) if sympy_primality_test(x)}
     testers = [
         ("Fermat", fermat_primality_test),
         ("Miller-Rabin(stolen)", miller_rabin_copypasted_from_the_internet),
         ("Miller-Rabin", miller_rabin),
         ("sympy.isprime", sympy_primality_test),
+        ("Lehmann", lehmann),
     ]
     t0 = time.time()
     for tester_name, test in testers:
