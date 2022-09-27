@@ -90,7 +90,7 @@ def miller_rabin(n):
 
 
 if __name__ == "__main__":
-    primes = {x for x in range(2**16) if sympy_primality_test(x)}
+    primes = {x for x in range(2**20) if sympy_primality_test(x)}
     testers = [
         ("Fermat", fermat_primality_test),
         ("Miller-Rabin(stolen)", miller_rabin_copypasted_from_the_internet),
@@ -101,9 +101,11 @@ if __name__ == "__main__":
     t0 = time.time()
     for tester_name, test in testers:
         print(f" --- testing {tester_name}")
-        for n in range(2**8):
-            if (n in primes) != test(n):
-                print(f"Wrong answer for {n}")
+        wrong_answers = 0
+        for n in range(2**20):
+            wrong_answers += (n in primes) != test(n)
+        if wrong_answers:
+            print("Wrong answers on small numbers:", wrong_answers)
         print("Time of checking small numbers:", time.time() - t0)
         t0 = time.time()
         assert test(mersene_prime(21))
