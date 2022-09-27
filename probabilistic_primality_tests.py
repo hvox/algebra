@@ -89,12 +89,34 @@ def miller_rabin(n):
     return True
 
 
+def miller_rabin_jim_sinclair(n):
+    if n < 2:
+        return False
+    s = count_trailing_zeros(n - 1)
+    d = (n - 1) >> s
+    for a in JIM_SINCLAIR_BASES:
+        if (a := a % n) == 0:
+            return True
+        x = pow(a, d, n)
+        if x != 1 and x != n - 1:
+            for _ in range(s):
+                if x == n - 1:
+                    break
+                if x == 1:
+                    return False
+                x = pow(x, 2, n)
+            else:
+                return False
+    return True
+
+
 if __name__ == "__main__":
     primes = {x for x in range(2**20) if sympy_primality_test(x)}
     testers = [
         ("Fermat", fermat_primality_test),
         ("Miller-Rabin(stolen)", miller_rabin_copypasted_from_the_internet),
         ("Miller-Rabin", miller_rabin),
+        ("Miller-Rabin(Jim Sinclair bases only)", miller_rabin_jim_sinclair),
         ("sympy.isprime", sympy_primality_test),
         ("Lehmann", lehmann),
     ]
