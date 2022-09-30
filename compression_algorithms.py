@@ -1,28 +1,28 @@
-from fractions import Fraction
+from fractions import Fraction as Rat
 from math import log, ceil
 
 
 def fraction_to_bin(number, digits: int) -> str:
-    number, representation = Fraction(number), []
+    number, representation = Rat(number), []
     for _ in range(digits):
         number *= 2
         representation.append("01"[number >= 1])
         number %= 1
-    return representation
+    return "".join(representation)
 
 
-def shannon(frequencies: list[int], n: int = 2) -> list[tuple[int, ...]]:
+def shannon(frequencies: list[Rat], n: int = 2) -> list[tuple[int, ...]]:
     assert n == 2
-    frequencies = list(map(Fraction, reversed(sorted(frequencies))))
-    whole, encoding, left = sum(frequencies), [], 0
+    frequencies = [Rat(x) for x in reversed(sorted(frequencies))]
+    whole, encoding, left = sum(frequencies), [], Rat(0)
     for freq in frequencies:
         digits = ceil(-log(freq / whole, 2))
-        encoding.append(fraction_to_bin(left / whole, digits))
+        encoding.append(tuple(map(int, fraction_to_bin(left / whole, digits))))
         left += freq
     return encoding
 
 
-def _shannon_fano(frequencies: list[int], n: int = 2):
+def _shannon_fano(frequencies: list[Rat], n: int = 2):
     if len(frequencies) <= n:
         if len(frequencies) < 2:
             yield ()
@@ -30,10 +30,10 @@ def _shannon_fano(frequencies: list[int], n: int = 2):
         yield from ((i,) for i, _ in enumerate(frequencies))
         return
     separators = [0]
-    whole, left, i = sum(frequencies), 0, 0
+    whole, left, i = sum(frequencies), Rat(0), 0
     for separator in range(1, n):
-        separator = whole / n * separator
-        while abs(left + frequencies[i] - separator) < abs(left - separator):
+        sep = Rat(whole) / n * separator
+        while abs(left + frequencies[i] - sep) < abs(left - sep):
             left += frequencies[i]
             i += 1
         separators.append(i)
@@ -44,9 +44,9 @@ def _shannon_fano(frequencies: list[int], n: int = 2):
             yield (part,) + tail
 
 
-def shannon_fano(frequencies: list[int], n: int = 2) -> list[tuple[int, ...]]:
+def shannon_fano(frequencies: list[Rat], n: int = 2) -> list[tuple[int, ...]]:
     sorted_freqs = list(sorted(enumerate(frequencies), key=lambda x: -x[1]))
-    encoding = [None] * len(sorted_freqs)
+    encoding: list[tuple[int, ...]] = [()] * len(sorted_freqs)
     for i, code in enumerate(_shannon_fano([f for _, f in sorted_freqs], n)):
         encoding[sorted_freqs[i][0]] = code
     return encoding
