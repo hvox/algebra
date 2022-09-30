@@ -15,12 +15,15 @@ def fraction_to_bin(number, digits: int) -> str:
 
 def shannon(frequencies: list[Rat], n: int = 2) -> Encoding:
     assert n == 2
-    frequencies = [Rat(x) for x in reversed(sorted(frequencies))]
+    sorted_freqs = list(sorted(enumerate(frequencies), key=lambda x: -x[1]))
+    frequencies = [freq for _, freq in sorted_freqs]
     whole, encoding, left = sum(frequencies), [], Rat(0)
     for freq in frequencies:
         digits = ceil(-log(freq / whole, 2))
         encoding.append(tuple(map(int, fraction_to_bin(left / whole, digits))))
         left += freq
+    for i, code in enumerate(list(encoding)):
+        encoding[sorted_freqs[i][0]] = code
     return encoding
 
 
