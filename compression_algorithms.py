@@ -1,5 +1,6 @@
 from fractions import Fraction as Rat
 from math import log, ceil
+
 Encoding = list[tuple[int, ...]]
 
 
@@ -77,9 +78,11 @@ def shannon_fano(frequencies: list[Rat], n: int = 2) -> Encoding:
 probs = [Rat(x) for x in "0.36 0.18 0.18 0.12 0.09 0.07".split()]
 print(" ".join(map(str, map(float, probs))))
 for name, f in (
-        ("Shannon", shannon),
-        ("Shannon(shrinked)", shannon_shrinked),
-        ("Shannon-Fano", shannon_fano),
-        ):
-    encoding = " ".join("".join(map(str, code)) for code in f(probs))
-    print(f"{name}:\n  " + encoding)
+    ("Shannon", shannon),
+    ("Shannon(shrinked)", shannon_shrinked),
+    ("Shannon-Fano", shannon_fano),
+):
+    encoding = f(probs)
+    avg_len = sum(len(code) * p for code, p in zip(encoding, probs))
+    print(f"{name}: avg_len =", float(avg_len))
+    print(" ", " ".join("".join(map(str, x)) for x in encoding))
