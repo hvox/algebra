@@ -78,6 +78,19 @@ def shannon_fano(frequencies: list[Rat], n: int = 2) -> Encoding:
     return encoding
 
 
+def huffman(frequencies: list[Rat], n: int = 2) -> Encoding:
+    assert n == 2
+    sorted_freqs = list(sorted(enumerate(frequencies), key=lambda x: -x[1]))
+    frequencies = [freq for _, freq in sorted_freqs]
+    # TODO: I was here
+    for i, code in enumerate(list(encoding)):
+        encoding[sorted_freqs[i][0]] = code
+    return encoding
+
+
+# TODO: add checker if coding is decodable
+
+
 probs = [Rat(x) for x in "0.36 0.18 0.18 0.12 0.09 0.07".split()]
 print(" ".join(map(str, map(float, probs))))
 for name, f in (
