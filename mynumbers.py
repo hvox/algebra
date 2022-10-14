@@ -30,6 +30,24 @@ def fraction_to_recurring_decimal(fraction, max_digits=None):
     return integer_part + "." + main_part + repeating_part
 
 
+def fraction_to_recurring_binary(fraction, max_digits=None):
+    numerator, denominator = fraction.numerator, fraction.denominator
+    integer_part = str(numerator // denominator)
+    numerator = numerator % denominator
+    digits, states = [], {}
+    while numerator and numerator not in states:
+        states[numerator] = len(digits)
+        digits.append(numerator * 2 // denominator)
+        numerator = numerator * 2 % denominator
+        if max_digits is not None and len(digits) > max_digits:
+            return None
+    if not numerator:
+        return integer_part + ("." + "".join(map(str, digits))) * bool(digits)
+    main_part = "".join(map(str, digits[: states[numerator]]))
+    repeating_part = "(" + "".join(map(str, digits[states[numerator] :])) + ")"
+    return integer_part + "." + main_part + repeating_part
+
+
 def fraction_to_sum(fraction):
     numerator, denominator = fraction.numerator, fraction.denominator
     integer_part = numerator // denominator
@@ -50,6 +68,9 @@ def fraction_to_short_str(fraction):
 class Rational(Fraction):
     def as_recurring_decimal(self):
         return fraction_to_recurring_decimal(self)
+
+    def as_recurring_binary(self):
+        return fraction_to_recurring_binary(self)
 
     def as_sum(self):
         return fraction_to_sum(self)

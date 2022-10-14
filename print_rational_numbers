@@ -9,6 +9,7 @@ try:
             print("as sum =", x.as_sum())
             print("as frc =", x.as_fraction())
             print("as dec =", x.as_recurring_decimal())
+            print("as bin =", x.as_recurring_binary())
             print("as str =", x.as_short_string())
             print("as flt =", y.as_recurring_decimal())
             print()
