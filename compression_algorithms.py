@@ -14,6 +14,25 @@ def fraction_to_bin(number, digits: int) -> str:
     return "".join(representation)
 
 
+def int_to_digits(number: int, base: int = 2) -> tuple[int, ...]:
+    digits = [number % base]
+    number //= base
+    while number:
+        digits.append(number % base)
+        number //= base
+    return tuple(digits)
+
+
+def same_length(frequencies: list[Rat], n: int = 2) -> Encoding:
+    digits = 1
+    while n ** digits < len(frequencies):
+        digits += 1
+    encoding = [int_to_digits(i, n) for i in range(len(frequencies))]
+    for i, code in enumerate(encoding):
+        encoding[i] = code + (0,) * (digits - len(code))
+    return encoding
+
+
 def shannon(frequencies: list[Rat], n: int = 2) -> Encoding:
     assert n == 2
     sorted_freqs = list(sorted(enumerate(frequencies), key=lambda x: -x[1]))
@@ -102,6 +121,7 @@ def huffman(frequencies: list[Rat], n: int = 2) -> Encoding:
 probs = [Rat(x) for x in "0.36 0.18 0.18 0.12 0.09 0.07".split()]
 print(" ".join(map(str, map(float, probs))))
 for name, f in (
+    ("Same length", same_length),
     ("Shannon", shannon),
     ("Shannon(shrinked)", shannon_shrinked),
     ("Shannon-Fano", shannon_fano),
