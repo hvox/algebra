@@ -1,5 +1,6 @@
 from fractions import Fraction as Rat
 from math import log, ceil
+from queue import PriorityQueue
 
 Encoding = list[tuple[int, ...]]
 
@@ -80,11 +81,18 @@ def shannon_fano(frequencies: list[Rat], n: int = 2) -> Encoding:
 
 def huffman(frequencies: list[Rat], n: int = 2) -> Encoding:
     assert n == 2
-    sorted_freqs = list(sorted(enumerate(frequencies), key=lambda x: -x[1]))
-    frequencies = [freq for _, freq in sorted_freqs]
-    # TODO: I was here
-    for i, code in enumerate(list(encoding)):
-        encoding[sorted_freqs[i][0]] = code
+    queue = PriorityQueue()
+    for i, freq in enumerate(frequencies):
+        queue.put((freq, [((), i)]))
+    for _ in range(len(frequencies) - 1):
+        f2, right = queue.get()
+        f1, left = queue.get()
+        result = [((0,) + code, i) for code, i in left]
+        result += [((1,) + code, i) for code, i in right]
+        queue.put((f1 + f2, result))
+    encoding = [()] * len(frequencies)
+    for code, i in queue.get()[1]:
+        encoding[i] = code
     return encoding
 
 
@@ -97,8 +105,9 @@ for name, f in (
     ("Shannon", shannon),
     ("Shannon(shrinked)", shannon_shrinked),
     ("Shannon-Fano", shannon_fano),
+    ("Huffman", huffman),
 ):
     encoding = f(probs)
     avg_len = sum(len(code) * p for code, p in zip(encoding, probs))
-    print(f"{name}: avg_len =", float(avg_len))
+    print(f"{name:18} avg_len =", float(avg_len))
     print(" ", " ".join("".join(map(str, x)) for x in encoding))
