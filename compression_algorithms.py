@@ -118,7 +118,15 @@ def huffman(frequencies: list[Rat], n: int = 2) -> Encoding:
 # TODO: add checker if coding is decodable
 
 
-probs = [Rat(x) for x in "0.36 0.18 0.18 0.12 0.09 0.07".split()]
+alphabet = {
+    "aboba": 0.36,
+    "bublik": 0.18,
+    "dranik": 0.18,
+    "tuta": 0.12,
+    "aaa": 0.09,
+    "kva": 0.07,
+}
+probs = [Rat(x) for x in alphabet.values()]
 print(" ".join(map(str, map(float, probs))))
 for name, f in (
     ("Same length", same_length),
@@ -131,3 +139,7 @@ for name, f in (
     avg_len = sum(len(code) * p for code, p in zip(encoding, probs))
     print(f"{name:18} avg_len =", float(avg_len))
     print(" ", " ".join("".join(map(str, x)) for x in encoding))
+print("ENCODING = {")
+for character, code in zip(alphabet, encoding):
+    print(f"\t{character!r}: {''.join(map(str, code))!r},")
+print("}")
